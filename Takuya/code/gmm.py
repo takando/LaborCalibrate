@@ -41,14 +41,20 @@ def error_vec(hrs_data, tot_hrs_av, init_vals, args, simple):
 def criterion(params, *args):
     '''
     '''
-    chi_n_vec = params
+    beta_0, beta_1, beta_2, beta_3, beta_4, beta_5 = params
     hrs_data, tot_hrs_av, r_init, c1_init, S, beta, sigma, l_tilde, b_ellip, upsilon, A, alpha,\
      delta, Bsct_Tol, Eul_Tol, EulDiff, xi, maxiter, W = args
+    
+    s_values = np.arange(1, S+1)
+
+    chi_n_vec = beta_0 + beta_1 * s_values + beta_2 * s_values**2 + \
+     beta_3 * s_values ** 3 + beta_4 * s_values ** 4 + beta_5 * s_values **5
+
     mod_args = (S, beta, sigma, l_tilde, b_ellip, upsilon, chi_n_vec, A, alpha,
      delta, Bsct_Tol, Eul_Tol, EulDiff, xi, maxiter)
     init_vals = (r_init, c1_init)
     err = error_vec(hrs_data, tot_hrs_av, init_vals, mod_args, simple=False)
-    crit_val = err.T @ W @ err
+    crit_val = np.dot(np.dot(err.T, W), err)
     print(crit_val)
     print(crit_val)
     print(crit_val)
@@ -69,19 +75,20 @@ def calibrate_chi_n(hrs_data, tot_hrs_av, init_vals, args):
     '''
     '''
     r_init, c1_init = init_vals
-    S, beta, sigma, l_tilde, b_ellip, upsilon, chi_n_vec, A, alpha,\
+
+    S, beta, sigma, l_tilde, beta_0,\
+     beta_1, beta_2, beta_3, beta_4, beta_5, b_ellip, upsilon, A, alpha,\
      delta, Bsct_Tol, Eul_Tol, EulDiff, xi, maxiter = args
 
-    params_init = chi_n_vec
-    W_hat = np.eye(len(chi_n_vec))
+    params_init = np.array([beta_0, beta_1, beta_2, beta_3, beta_4, beta_5])
+    W_hat = np.eye(S)
     gmm_args = (hrs_data,tot_hrs_av, r_init, c1_init, S, beta, sigma, l_tilde, b_ellip, upsilon, A, alpha,\
      delta, Bsct_Tol, Eul_Tol, EulDiff, xi, maxiter, W_hat)
     results = opt.minimize(criterion, params_init, args=gmm_args,
-                       tol=1e-14, method='SLSQP',
-                       bounds=((1e-10, None), )*len(chi_n_vec))
+                       tol=1e-14, method='L-BFGS-B')
     
-    chi_n_vec = results.x
+    results_betas = results.x
 
-    return chi_n_vec
+    return results_betas
 
 
