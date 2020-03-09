@@ -11,17 +11,22 @@ import elliputil as elp
 import utilities as utils
 
 # Household parameters
-S = int(55)
+S = int(80)
 beta_annual = 0.96
-beta = beta_annual ** (55 / S)
+beta = beta_annual ** (80 / S)
 sigma = 2.5
 l_tilde = 1.0
-chi_n_vec = 1.0 * np.ones(S)
+
+(beta_0, beta_1, beta_2, beta_3, beta_4, beta_5) = \
+(1, 0, 0, 0, 0, 0)
+
+# chi_n_vec = 1.0 * np.ones(S)
+
 # Firm parameters
 A = 1.0
 alpha = 0.35
 delta_annual = 0.05
-delta = 1 - ((1 - delta_annual) ** (55 / S))
+delta = 1 - ((1 - delta_annual) ** (80 / S))
 # SS parameters
 SS_solve = True
 SS_BsctTol = 1e-13
@@ -41,14 +46,15 @@ cfe_params = np.array([Frisch_elast, CFE_scale])
 b_ellip, upsilon = elp.fit_ellip_CFE(ellip_init, cfe_params, l_tilde,
                                      ellip_graph)
 
-hrs_data = np.array(loadtxt("avghrs_data.csv", delimiter=","))
+hrs_data = loadtxt("adj_hrs_data.csv", delimiter=",")
 
-tot_hrs_av = 168
+tot_hrs_av = 133
 
 # Compute steady-state solution
-ss_args = (S, beta, sigma, l_tilde, b_ellip, upsilon, chi_n_vec, A,
-           alpha, delta, SS_BsctTol, SS_EulTol, SS_EulDiff, xi_SS,
-           SS_maxiter)
+ss_args = (S, beta, sigma, l_tilde, beta_0,\
+           beta_1, beta_2, beta_3, beta_4, beta_5, b_ellip,\
+           upsilon, A, alpha, delta, SS_BsctTol,\
+           SS_EulTol, SS_EulDiff, xi_SS, SS_maxiter)
 
 
 if SS_solve:
