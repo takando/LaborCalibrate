@@ -77,7 +77,7 @@ def calibrate_chi_n(hrs_data, tot_hrs_av, init_vals, args):
     gmm_args = (hrs_data,tot_hrs_av, r_init, c1_init, S, beta, sigma, l_tilde, b_ellip, upsilon, A, alpha,\
      delta, Bsct_Tol, Eul_Tol, EulDiff, xi, maxiter, W_hat)
     results = opt.minimize(criterion, params_init, args=gmm_args,
-                       tol=1e-14, method='SLSQP',
+                       tol=1e-14, method='L-BFGS-B',
                        bounds=((1e-10, None), )*len(chi_n_vec))
     
     chi_n_vec = results.x
