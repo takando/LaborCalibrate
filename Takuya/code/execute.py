@@ -103,7 +103,7 @@ SS_maxiter = 200
 # TPI parameters
 T1 = int(round(2.0 * S))
 T2 = int(round(2.5 * S))
-TPI_solve = True
+TPI_solve = False
 TPI_OutTol = 1e-7
 TPI_InTol = 1e-13
 maxiter_TPI = 200
